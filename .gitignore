@@ -1,3 +1,5 @@
 # Dependency directories
 node_modules/
-public/clickbait17-train-170630/*
+public/clickbait17-train-170630/media/
+public/clickbait17-train-170630/instances.jsonl
+public/clickbait17-train-170630/truth.jsonl
