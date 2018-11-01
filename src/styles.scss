@@ -55,11 +55,6 @@ img {
 
 .list-container {
     padding: 20px;
-    position: fixed;
-    top: 0; bottom: 0;
-    left: 0; right: 0;
-    overflow-y: auto;
-    width: 100vw;
 
     .list-content {
         column-width: 400px;
@@ -322,15 +317,10 @@ img {
     top: 0; bottom: 0;
     left: 0; right: 0;
     overflow: auto;
-    pointer-events: none;
+    display: none;
     opacity: 0;
 
     transition: opacity .15s ease-in-out;
-
-    &.visible {
-        pointer-events: all;
-        opacity: 1;
-    }
 
     .close-icon {
         position: fixed;
@@ -367,7 +357,7 @@ img {
         }
 
         section {
-            padding: 30px 120px;
+            padding: 30px 80px;
         }
 
         h1 {
@@ -413,6 +403,17 @@ img {
             }
         }
     }
+}
+
+body.overlay-visible {
+    overflow: hidden;
+    margin-right: 16px;
+}
+
+body.overlay-visible .target-overlay {
+    pointer-events: all;
+    opacity: 1;
+    display: block;
 }
 
 @media only screen and (max-width: 600px) {

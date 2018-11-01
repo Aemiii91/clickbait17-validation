@@ -29,13 +29,6 @@ img {
 
 .list-container {
   padding: 20px;
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  overflow-y: auto;
-  width: 100vw;
 }
 
 .list-container .list-content {
@@ -275,15 +268,10 @@ img {
   left: 0;
   right: 0;
   overflow: auto;
-  pointer-events: none;
+  display: none;
   opacity: 0;
   -webkit-transition: opacity .15s ease-in-out;
   transition: opacity .15s ease-in-out;
-}
-
-.target-overlay.visible {
-  pointer-events: all;
-  opacity: 1;
 }
 
 .target-overlay .close-icon {
@@ -322,7 +310,7 @@ img {
 }
 
 .target-overlay article section {
-  padding: 30px 120px;
+  padding: 30px 80px;
 }
 
 .target-overlay article h1 {
@@ -366,6 +354,17 @@ img {
   width: 20%;
   border: 2px solid #E1E8ED;
   border-radius: 2px;
+}
+
+body.overlay-visible {
+  overflow: hidden;
+  margin-right: 16px;
+}
+
+body.overlay-visible .target-overlay {
+  pointer-events: all;
+  opacity: 1;
+  display: block;
 }
 
 @media only screen and (max-width: 600px) {
