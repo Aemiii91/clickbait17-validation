@@ -3,7 +3,7 @@
     "liveSassCompile.settings.formats": [{
         "format": "expanded",
         "extensionName": ".css",
-        "savePath": "public/css"
+        "savePath": "/public/css"
     }
 ],
 "git.ignoreLimitWarning": true
