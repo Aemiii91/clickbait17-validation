@@ -1,0 +1,457 @@
+$app-back-color: #10171e;
+$app-fore-color: #fff;
+
+$tweet-content-back-color: #fff;
+$tweet-content-fore-color: #292F33;
+$tweet-footer-back-color: #15202b;
+
+$tweet-link-color: #1DA1F2;
+$tweet-author-color: #14171a;
+$tweet-author-image-color: #CCD6DD;
+
+$tweet-secondary-color: #657786;
+
+$tweet-target-border-color: #E1E8ED;
+$tweet-target-link-color: #8899A6;
+
+$progress-back-color: #163043;
+$progress-fore-color: #1da1f2;
+$progress-clickbait-color: #f11d1d;
+
+$text-sneaky-color: #163043;
+
+$article-back-color: #fff;
+$article-fore-color: #292F33;
+
+
+
+body {
+    background-color: $app-back-color;
+    color: $app-fore-color;
+    
+    font-size: 14px;
+    font-family: "Segoe UI",Arial,sans-serif;
+}
+
+body, p, div, article, section, header, figure, h1, h2, h3, h4, h5, h6 {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+.loading-icon {
+    display: block;
+    margin: 120px auto;
+    width: 200px;
+}
+
+.align-right {
+    float: right;
+}
+
+.list-container {
+    padding: 20px;
+    position: fixed;
+    top: 0; bottom: 0;
+    left: 0; right: 0;
+    overflow-y: auto;
+    width: 100vw;
+
+    .list-content {
+        column-width: 400px;
+    }
+}
+
+@media print {
+    .list-container {
+        position: relative;
+        overflow: visible;
+    }
+}
+
+.card {
+    position: relative;
+    max-width: 510px;
+    min-height: 51px;
+    background-color: $tweet-footer-back-color;
+    border-radius: 8px;
+    color: $tweet-content-fore-color;
+    font-size: 14px;
+    font-family: "Segoe UI",Arial,sans-serif;
+    line-height: 1.3em;
+    margin: 0 auto 44px;
+    break-inside: avoid-column;
+
+    a, a:visited {
+        color: $tweet-link-color;
+        text-decoration: none;
+    }
+
+    a[href]:hover {
+        text-decoration: underline;
+    }
+
+    .tweet {
+        background-color: $tweet-content-back-color;
+        padding: 30px 40px;
+        border-radius: 8px;
+    }
+
+    header {        
+        .author {
+            line-height: 1.5em;
+            margin-left: 58px;
+            margin-bottom: 15px;
+
+            &::before {
+                content: " ";
+                width: 48px;
+                height: 48px;
+                position: absolute;
+                left: 40px;
+                border-radius: 50%;
+                background-color: $tweet-author-image-color;
+            }
+
+            &::after {
+                clear: both;
+            }
+
+            b.username {
+                color: $tweet-author-color;
+                font-size: 18px;
+                font-weight: bold;
+                margin-right: 5px;
+            }
+
+            span.tag {
+                display: block;
+                color: $tweet-secondary-color;
+            }
+        }
+
+        .message {
+            font-size: 27px;
+            line-height: 32px;
+            letter-spacing: .01em;
+        }
+    }
+
+    section.target {
+        border: 1px solid $tweet-target-border-color;
+        border-radius: 12px;
+        margin-top: 20px;
+        font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+
+        transition: background-color .15s ease-in-out,border-color .15s ease-in-out;
+
+        &:hover {
+            background: #F5F8FA;
+            border-color: rgba(136,153,166,.5);
+        }
+    
+        figure.media {
+            overflow: hidden;
+            max-height: 250px;
+    
+            img {
+                width: 100%;
+            }
+        }
+
+        div.summary {
+            padding: 0.75em 1em;
+        }
+
+        h2.title {
+            font-size: 1em;
+            margin: 0 0 .15em;
+            max-height: 1.3em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        p.description {
+            margin-top: .32333em;
+            max-height: 2.6em;
+            overflow: hidden;
+        }
+
+        a.sharedlink {
+            margin-top: .32333em;
+            display: block;
+            text-transform: lowercase;
+            max-height: 1.3em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: $tweet-target-link-color;
+
+            &:hover {
+                text-decoration: none;
+            }
+        }
+    }
+
+    time.timestamp {
+        color: $tweet-secondary-color;
+        line-height: 24px;
+        margin-top: 10px;
+        display: block;
+    }
+
+    footer {
+        padding: 0 22px 22px;
+        color: $tweet-target-link-color;
+        font-size: 12px;
+        position: relative;
+        margin-top: 10px;
+
+        p {
+            margin-top: .32333em;
+        }
+
+        progress.truth {
+            width: 20%;
+            height: 4px;
+            -webkit-appearance: none;
+            background-color: $progress-back-color;
+            color: $progress-fore-color;
+            border: 0;
+            border-radius: 2px;
+
+            &::-moz-progress-bar {
+                background-color: $progress-back-color;
+                border: 0;
+                border-radius: 2px;
+            }
+            &::-webkit-progress-bar {
+                background-color: $progress-back-color;
+                border: 0;
+                border-radius: 2px;
+            }
+
+            &::-moz-progress-value {
+                background-color: $progress-fore-color;
+                border: 0;
+                border-radius: 2px;
+            }
+            &::-webkit-progress-value {
+                background-color: $progress-fore-color;
+                border: 0;
+                border-radius: 2px;
+            }
+        }
+
+        code.entry-id {
+            color: $text-sneaky-color;
+        }
+    }
+}
+
+.card.clickbait {
+    footer progress.truth {
+        color: $progress-clickbait-color;
+
+        &::-moz-progress-value {
+            background-color: $progress-clickbait-color;
+        }
+        &::-webkit-progress-value {
+            background-color: $progress-clickbait-color;
+        }
+    }
+
+    // section.target {
+    //     &::after {
+    //         content: "WARNING: This post has been flagged as clickbait.";
+    //         position: absolute;
+    //         bottom: 0;
+    //         left: 0;
+    //         right: 0;
+    //         background: #eee;
+    //         color: #b00;
+    //         font-weight: bold;
+    //         font-size: 0.9em;
+    //         text-align: center;
+    //         padding: 4px 12px;
+    //         opacity: 0;
+
+    //         transition: opacity .15s ease-in-out;
+    //     }
+
+    //     &:hover::after {
+    //         opacity: 1;
+    //     }
+    // }
+}
+
+
+.striked-text {
+    position: relative;
+    display: inline-block;
+    opacity: 0.5;
+
+    &::after {
+        content: " ";
+        border-bottom-width: 0.5em;
+        border-bottom-style: solid;
+        width: 100%;
+        position: absolute;
+        right: 0;
+        top: 40%;
+    }
+}
+
+
+.no-scroll {
+    overflow: hidden;
+}
+
+
+.target-overlay {
+    background-color: rgba(0,0,0,0.85);
+    position: fixed;
+    top: 0; bottom: 0;
+    left: 0; right: 0;
+    overflow: auto;
+    pointer-events: none;
+    opacity: 0;
+
+    transition: opacity .15s ease-in-out;
+
+    &.visible {
+        pointer-events: all;
+        opacity: 1;
+    }
+
+    .close-icon {
+        position: fixed;
+        top: 20px;
+        right: 40px;
+        margin: 20px;
+    }
+
+    article {
+        background-color: $article-back-color;
+        color: $article-fore-color;
+        max-width: 21cm;
+        border-radius: 9px;
+        margin: 50px auto;
+
+        a, a:visited {
+            color: $tweet-link-color;
+            text-decoration: none;
+        }
+    
+        a[href]:hover {
+            text-decoration: underline;
+        }
+
+        figure {
+            overflow: hidden;
+            max-height: 75vh;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+    
+            img {
+                width: 100%;
+            }
+        }
+
+        section {
+            padding: 30px 120px;
+        }
+
+        h1 {
+            font-size: 2.4em;
+            margin: 2.6rem 0;
+            line-height: 2.6rem;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 2rem;
+            margin-bottom: 1.5rem;
+
+            &[data-word-count="1"] {
+                display: inline-block;
+                font-size: 14px;
+
+                &::after {
+                    content: "\000a0\000a0";
+                }
+            }
+        }
+
+        footer {
+            font-size: 14px;
+            color: $tweet-secondary-color;
+            margin-bottom: 2.6rem;
+            text-align: center;
+
+            span {
+                display: inline-block;
+                margin-top: 10px;
+                margin-right: 10px;
+            }
+
+            &::before {
+                content: " ";
+                display: block;
+                margin: 40px auto;
+                width: 20%;
+                border: 2px solid $tweet-target-border-color;
+                border-radius: 2px;
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .target-overlay article section {
+        padding: 30px 40px;
+    }
+}
+
+
+.close-icon {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    overflow: hidden;
+    cursor: pointer;
+
+    &:hover {
+        &::before,
+        &::after {
+            background: $tweet-link-color;
+        }
+    }
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        left: 0;
+        background: #fff;
+        border-radius: 5px;
+        height: 2px;
+        margin-top: -1px;
+    }
+    &::before {
+        transform: rotate(45deg);
+    }
+    &::after {
+        transform: rotate(-45deg);
+    }
+}
