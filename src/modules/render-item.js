@@ -27,7 +27,7 @@ function renderItem(item) {
     </div>
     <footer>
         <p class="align-right"><code class="entry-id">${item.id}</code></p>
-        <progress class="truth" title="${item.truth.text}" max=1 value=${item.truth.mean}></progress>
+        <span data-title="${item.truth.text}"><progress class="truth" max=1 value=${item.truth.mean}></progress></span>
     </footer>
 </article>`;
 

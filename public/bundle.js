@@ -4540,10 +4540,8 @@
 	}
 
 	function tweetLinks(text) {
-	  return text.replace(/(#.*?)(?=$|\W)/g, function (result, match) {
-	    return "<a>".concat(match, "</a>");
-	  }).replace(/(@.*?)(?=$|\W)/g, function (result, match) {
-	    return "<a>".concat(match, "</a>");
+	  return text.replace(/(^|\s)(@|#)(.*?)(?=$|\W)/g, function (result, m1, m2, m3) {
+	    return "".concat(m1, "<a href=\"https://twitter.com/").concat((m2 == "#" ? "hashtag/" : "") + m3, "\" target=\"_blank\">").concat(m2 + m3, "</a>");
 	  });
 	}
 
@@ -4555,7 +4553,7 @@
 	    mediaTag = "<figure class=\"media\"><img src=\"".concat(item.postMedia[0], "\"></figure>");
 	  }
 
-	  el.innerHTML = "<article class=\"card ".concat(item.truth.class, "\" data-index=\"").concat(item.index, "\">\n    <div class=\"tweet\">\n        <header>\n            <div class=\"author\"><b class=\"username\"><span class=\"striked-text\">").concat(randBlankString(20, 40), "</span></b><span class=\"tag\"><span class=\"striked-text\">").concat(randBlankString(12, 24), "</span></span></div>\n            <p class=\"message\">").concat(tweetLinks(item.postText[0]), "</p>\n        </header>\n        <section class=\"target\" data-item=\"").concat(item.index, "\">\n            ").concat(mediaTag, "\n            <div class=\"summary\">\n                <h2 class=\"title\" title=\"").concat(item.targetTitle, "\">").concat(item.targetTitle, "</h2>\n                <p class=\"description\">").concat(item.targetDescription, "</p>\n                <a class=\"sharedlink\"><span class=\"striked-text\">").concat(randBlankString(24, 36), "</span></a>\n            </div>\n        </section>\n        <time class=\"timestamp\" datetime=\"").concat(item.timestamp.format(), "\">").concat(item.timestamp.format("h:mm A - MMM Do YYYY"), "</time>\n    </div>\n    <footer>\n        <p class=\"align-right\"><code class=\"entry-id\">").concat(item.id, "</code></p>\n        <progress class=\"truth\" title=\"").concat(item.truth.text, "\" max=1 value=").concat(item.truth.mean, "></progress>\n    </footer>\n</article>");
+	  el.innerHTML = "<article class=\"card ".concat(item.truth.class, "\" data-index=\"").concat(item.index, "\">\n    <div class=\"tweet\">\n        <header>\n            <div class=\"author\"><b class=\"username\"><span class=\"striked-text\">").concat(randBlankString(20, 40), "</span></b><span class=\"tag\"><span class=\"striked-text\">").concat(randBlankString(12, 24), "</span></span></div>\n            <p class=\"message\">").concat(tweetLinks(item.postText[0]), "</p>\n        </header>\n        <section class=\"target\" data-item=\"").concat(item.index, "\">\n            ").concat(mediaTag, "\n            <div class=\"summary\">\n                <h2 class=\"title\" title=\"").concat(item.targetTitle, "\">").concat(item.targetTitle, "</h2>\n                <p class=\"description\">").concat(item.targetDescription, "</p>\n                <a class=\"sharedlink\"><span class=\"striked-text\">").concat(randBlankString(24, 36), "</span></a>\n            </div>\n        </section>\n        <time class=\"timestamp\" datetime=\"").concat(item.timestamp.format(), "\">").concat(item.timestamp.format("h:mm A - MMM Do YYYY"), "</time>\n    </div>\n    <footer>\n        <p class=\"align-right\"><code class=\"entry-id\">").concat(item.id, "</code></p>\n        <span data-title=\"").concat(item.truth.text, "\"><progress class=\"truth\" max=1 value=").concat(item.truth.mean, "></progress></span>\n    </footer>\n</article>");
 	  return el;
 	}
 

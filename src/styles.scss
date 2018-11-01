@@ -310,6 +310,31 @@ img {
     overflow: hidden;
 }
 
+*[data-title] {
+    position: relative;
+
+    &::before {
+        content: attr(data-title);
+        position: absolute;
+        top: -36px;
+        left: -12px;
+        background: #000;
+        border-radius: 4px;
+        color: #fff;
+        white-space: nowrap;
+        padding: 8px 12px;
+        max-width: 300px;
+        display: block;
+        opacity: 0;
+
+        transition: opacity .15s ease-in-out;
+    }
+
+    &:hover::before {
+        opacity: 1;
+    }
+}
+
 
 .target-overlay {
     background-color: rgba(0,0,0,0.85);
