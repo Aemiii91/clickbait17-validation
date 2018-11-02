@@ -1,6 +1,8 @@
 $app-back-color: #10171e;
 $app-fore-color: #fff;
 
+$topbar-back-color: #1c2938;
+
 $tweet-content-back-color: #fff;
 $tweet-content-fore-color: #292F33;
 $tweet-footer-back-color: #15202b;
@@ -25,22 +27,31 @@ $article-fore-color: #292F33;
 
 
 
+
+body, p, div, article, section, header, figure, h1, h2, h3, h4, h5, h6, button, input {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     background-color: $app-back-color;
     color: $app-fore-color;
     
     font-size: 14px;
     font-family: "Segoe UI",Arial,sans-serif;
-}
 
-body, p, div, article, section, header, figure, h1, h2, h3, h4, h5, h6 {
-    margin: 0; padding: 0;
-    box-sizing: border-box;
+    margin-bottom: 50px;
 }
 
 img {
     max-width: 100%;
     height: auto;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
 }
 
 .loading-icon {
@@ -50,8 +61,87 @@ img {
 }
 
 .align-right {
-    float: right;
+    position: absolute;
+    right: 0;
 }
+
+
+.bottombar {
+    position: fixed;
+    bottom: 8px; left: 0; right: 0;
+    padding: 0 22px;
+    height: 50px;
+    overflow: hidden;
+    z-index: 100;
+    color: $tweet-target-link-color;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+
+    .pagination {
+        background: $topbar-back-color;
+        padding: 0 12px;
+        border-radius: 25px;
+        height: 50px;
+        overflow: hidden;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        pointer-events: all;
+
+        button {
+            background: #15202b;
+            border: 1px solid #1DA1F2; outline: 0;
+            border-radius: 50%;
+            color: #1DA1F2;
+            width: 24px; height: 24px;
+            font-size: 9px;
+            cursor: pointer;
+
+            &:first-of-type {
+                border-top-right-radius: 0px;
+                border-bottom-right-radius: 0px;
+                border-right-width: 0px;
+            }
+
+            &:last-of-type {
+                border-top-left-radius: 0px;
+                border-bottom-left-radius: 0px;
+            }
+
+            &:hover, &:active {
+                background-color: #1B3448;
+            }
+        }
+
+        input {
+            background-color: #182430;
+            border-radius: 21px;
+            border: 1px solid #38444d;
+            color: #fff;
+            display: block;
+            font-size: 12px;
+            height: 32px;
+            line-height: 16px;
+            text-align: center;
+            width: 3rem;
+            margin-right: 8px;
+
+            &:focus {
+                outline: 0;
+                border: 2px solid #1DA1F2;
+            }
+        }
+
+        div {
+            margin-right: 8px;
+            font-size: 12px;
+        }
+    }
+}
+
 
 .list-container {
     padding: 20px;
@@ -80,6 +170,12 @@ img {
     line-height: 1.3em;
     margin: 0 auto 44px;
     break-inside: avoid-column;
+
+    &.active .tweet {
+        -webkit-box-shadow: inset 0px 0px 0px 4px $tweet-link-color;
+        -moz-box-shadow: inset 0px 0px 0px 4px $tweet-link-color;
+        box-shadow: inset 0px 0px 0px 4px $tweet-link-color;
+    }
 
     a, a:visited {
         color: $tweet-link-color;
@@ -136,7 +232,7 @@ img {
         }
     }
 
-    section.target {
+    div.target {
         border: 1px solid $tweet-target-border-color;
         border-radius: 12px;
         margin-top: 20px;
@@ -150,6 +246,24 @@ img {
         &:hover {
             background: #F5F8FA;
             border-color: rgba(136,153,166,.5);
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 0; right: 0;
+            border-radius: 12px;
+        }
+
+        &:focus {
+            outline: 0;
+
+            &::after {
+                -webkit-box-shadow: inset 0px 0px 0px 2px $tweet-link-color;
+                -moz-box-shadow: inset 0px 0px 0px 2px $tweet-link-color;
+                box-shadow: inset 0px 0px 0px 2px $tweet-link-color;
+            }
         }
     
         figure.media {
@@ -204,24 +318,33 @@ img {
     }
 
     footer {
-        padding: 0 22px 22px;
         color: $tweet-target-link-color;
         font-size: 12px;
-        position: relative;
-        margin-top: 10px;
+        
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
 
-        p {
-            margin-top: .32333em;
+        div {
+            padding: 10px;
+            width: 33.333%;
+
+            &.left { padding-left: 22px; }
+            &.center { text-align: center; }
+            &.right { text-align: right; padding-right: 22px; }
         }
 
         progress.truth {
-            width: 20%;
+            width: 100%;
             height: 4px;
             -webkit-appearance: none;
             background-color: $progress-back-color;
             color: $progress-fore-color;
             border: 0;
             border-radius: 2px;
+            display: block;
+            margin: 12px auto;
 
             &::-moz-progress-bar {
                 background-color: $progress-back-color;
@@ -303,6 +426,10 @@ img {
         right: 0;
         top: 40%;
     }
+
+    span {
+        color: rgba(0,0,0,0);
+    }
 }
 
 
@@ -316,16 +443,18 @@ img {
     &::before {
         content: attr(data-title);
         position: absolute;
-        top: -36px;
-        left: -12px;
-        background: #000;
-        border-radius: 4px;
-        color: #fff;
-        white-space: nowrap;
-        padding: 8px 12px;
+        top: -50%;
+        left: 50%;
         max-width: 300px;
-        display: block;
+        padding: 8px 12px;
+        background: #000;
+        color: #fff;
+        border-radius: 4px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        transform: translate(-50%, 0);
         opacity: 0;
+        pointer-events: none;
 
         transition: opacity .15s ease-in-out;
     }
@@ -344,8 +473,13 @@ img {
     overflow: auto;
     display: none;
     opacity: 0;
+    z-index: 200;
 
     transition: opacity .15s ease-in-out;
+
+    &:focus {
+        outline: 0;
+    }
 
     .close-icon {
         position: fixed;

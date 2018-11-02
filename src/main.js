@@ -12,11 +12,22 @@ var data = {
     lines: [],
     truth: { filename: "truth.jsonl", text: "", lines: [], items: [] },
     lookup: {},
-    count: 0
+    count: 0,
+    currentPage: -1,
+    itemsPerPage: 50
 };
+
+var settings = JSON.parse(localStorage.getItem('settings')) || {
+    currentPage: 1,
+    scrollTop: 0
+};
+
+var scrollTimer;
 
 
 function init() {
+    q("#currentPage").value = settings.currentPage;
+
     fetchQueue([data.path+data.filename, data.path+data.truth.filename]).then(function(fileContents) {
         data.text = fileContents[0].replace(/(\n|\r|\s)+$/, '');
         data.lines = data.text.split(/\r?\n/);
@@ -33,32 +44,114 @@ function init() {
         var listContent = document.createElement("div");
         listContent.id = "listContent";
         listContent.classList.add("list-content");
-
-        var segment = prompt(
-`Choose where to start. 100 items will be viewed.
-Click cancel to start from a random item.
-
-Enter number (from 1 - ${data.count}):`, 1)
-            || Math.round(Math.random()*data.count);
-
-        // validate user input
-        segment = (segment <= 0 ? 1 : (segment > data.count ? data.count : segment)) - 1;
-
-        for (var i = 0; i < 100; i++) {
-            var index = (segment + i);
-            if (index >= data.count) break;
-
-            var el = renderItem(getItemData(index));
-
-            el.querySelector("section.target").addEventListener("click", function() {
-                viewArticle(getItemData(this.getAttribute("data-item")));
-            });
-
-            listContent.appendChild(el);
-        }
-
         container.appendChild(listContent);
+
+        loadPage(settings.currentPage);
+
+        document.documentElement.scrollTop = settings.scrollTop || 0;
+
+        window.addEventListener("scroll", function() {
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(function() {
+                saveSetting("scrollTop", Math.round(document.documentElement.scrollTop));
+            }, 500);
+        });
+
+        q("#prevPageBtn").addEventListener("click", function() {
+            loadPage(data.currentPage - 1);
+        });
+        q("#nextPageBtn").addEventListener("click", function() {
+            loadPage(data.currentPage + 1);
+        });
+        q("#currentPage").addEventListener("change", function() {
+            loadPage(this.value);
+        });
+        q("#currentPage").addEventListener("focus", function() {
+            this.select();
+        });
+
+        document.body.addEventListener("mousedown", function() {
+            var el = q(".card.active");
+            if (el) el.classList.remove("active");
+        });
+        document.body.addEventListener("keydown", function(event) {
+            if (event.ctrlKey && event.key === "g") {
+                var index = prompt('Go to:');
+
+                if (!isNaN(index)) {
+                    var page = Math.ceil(index/data.itemsPerPage);
+                    if (data.currentPage !== page) loadPage(page);
+
+                    setTimeout(function() {
+                        var el = q(".card#card_" + (index-1));
+
+                        if (el) {
+                            document.documentElement.scrollTop = el.offsetTop - 20;
+                            el.classList.add("active");
+                        }
+                    }, 100);
+                }
+
+                event.preventDefault();
+            }
+            else if (event.keyCode === 27) { // ESC
+                var el = q(".card.active");
+                if (el) el.classList.remove("active");
+                if (document.body.classList.contains("overlay-visible")) {
+                    document.body.classList.remove("overlay-visible");
+                    if (data.lastFocusedItem) data.lastFocusedItem.focus();
+                }
+                else {
+                    document.activeElement.blur();
+                }
+            }
+        });
     });
+}
+
+function loadPage(page) {
+    var page_count = Math.ceil(data.count/data.itemsPerPage);
+    if (page > page_count) page = page_count;
+    if (page < 1) page = 1;
+
+    document.body.classList.remove("overlay-visible");
+
+    if (data.currentPage === page) return;
+
+    data.currentPage = page;
+    saveSetting("currentPage", page);
+
+    q("#currentPage").value = page;
+    q("#currentPage").setAttribute("max", page_count);
+    q("#totalPagesCount").textContent = page_count;
+
+    var listContent = q("#listContent");
+    listContent.textContent = "";
+
+    var startFrom = (page - 1) * data.itemsPerPage;
+
+    for (var i = 0; i < data.itemsPerPage; i++) {
+        var index = startFrom + i;
+        if (index >= data.count) break;
+
+        var el = renderItem(getItemData(index));
+
+        listContent.appendChild(el);
+
+        el.querySelector(".target").addEventListener("click", function(event) {
+            viewArticle(getItemData(this.getAttribute("data-item")));
+            event.preventDefault();
+        });
+        el.querySelector(".target").addEventListener("keydown", function(event) {
+            if (event.keyCode === 13) {
+                data.lastFocusedItem = this;
+                viewArticle(getItemData(this.getAttribute("data-item")));
+                event.preventDefault();
+            }
+        });
+    }
+
+    document.documentElement.scrollTop = 0;
 }
 
 function parseLines(lines) {
@@ -109,6 +202,11 @@ function getItemData(index) {
     }
 
     return item;
+}
+
+function saveSetting(propName, propValue) {
+    settings[propName] = propValue;
+    localStorage.setItem('settings', JSON.stringify(settings));
 }
 
 

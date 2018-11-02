@@ -56,6 +56,7 @@ export default function viewArticle(item) {
 
     document.body.classList.add("overlay-visible");
     container.scrollTop = 0;
+    container.focus();
 }
 
 function closeArticle(event) {

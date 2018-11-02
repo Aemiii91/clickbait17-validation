@@ -8,12 +8,13 @@
 </head>
 <body>
 <div id="listContainer" class="list-container">
-    <figure class="loading-icon"><img src="images/loading.gif"></figure>
+    <figure class="loading-icon"><img src="images/loading3.gif"></figure>
 </div>
-<div id="targetContainer" class="target-overlay">
+<div id="targetContainer" class="target-overlay" tabindex="-1">
     <div id="closeButton" class="close-icon"></div>
     <article id="targetContent"></article>
 </div>
+<div class="bottombar"><div class="pagination"><input type="number" id="currentPage" value="1" min="1"><div>of <span id="totalPagesCount">0</span></div><button id="prevPageBtn">&#x25c4;</button><button id="nextPageBtn">&#x25ba;</button></div></div>
 <script src="bundle.js"></script>
 </body>
 </html>
