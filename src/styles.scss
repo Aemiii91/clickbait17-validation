@@ -92,27 +92,37 @@ input[type=number]::-webkit-outer-spin-button {
         pointer-events: all;
 
         button {
-            background: #15202b;
+            background-color: #15202b;
             border: 1px solid #1DA1F2; outline: 0;
             border-radius: 50%;
             color: #1DA1F2;
             width: 24px; height: 24px;
             font-size: 9px;
+            z-index: 300;
             cursor: pointer;
 
             &:first-of-type {
                 border-top-right-radius: 0px;
                 border-bottom-right-radius: 0px;
-                border-right-width: 0px;
             }
 
             &:last-of-type {
                 border-top-left-radius: 0px;
                 border-bottom-left-radius: 0px;
+                position: relative;
+                left: -1px;
             }
 
-            &:hover, &:active {
-                background-color: #1B3448;
+            &:not(:disabled) {
+                &:hover, &:focus {
+                    background-color: #1B3448;
+                }
+            }
+
+            &:disabled {
+                border-color: #163043;
+                color: #38444d;
+                z-index: 250;
             }
         }
 
@@ -171,10 +181,27 @@ input[type=number]::-webkit-outer-spin-button {
     margin: 0 auto 44px;
     break-inside: avoid-column;
 
-    &.active .tweet {
-        -webkit-box-shadow: inset 0px 0px 0px 4px $tweet-link-color;
-        -moz-box-shadow: inset 0px 0px 0px 4px $tweet-link-color;
-        box-shadow: inset 0px 0px 0px 4px $tweet-link-color;
+    transition: opacity .15s ease-in-out;
+
+    body.cards-not-loaded & {
+        opacity: 0;
+    }
+
+    body.has-card-focused & {
+        opacity: 0.2;
+        pointer-events: none;
+        
+        &:focus {
+            outline: 0;
+            opacity: 1;
+            pointer-events: all;
+
+            // .tweet {
+            //     -webkit-box-shadow: inset 0px 0px 0px 4px $tweet-link-color;
+            //     -moz-box-shadow: inset 0px 0px 0px 4px $tweet-link-color;
+            //     box-shadow: inset 0px 0px 0px 4px $tweet-link-color;
+            // }
+        }
     }
 
     a, a:visited {
@@ -253,7 +280,7 @@ input[type=number]::-webkit-outer-spin-button {
             position: absolute;
             top: 0; bottom: 0;
             left: 0; right: 0;
-            border-radius: 12px;
+            border-radius: 10px;
         }
 
         &:focus {

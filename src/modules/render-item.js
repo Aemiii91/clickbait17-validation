@@ -9,11 +9,11 @@ function renderItem(item) {
         mediaTag = `<figure class="media"><img src="${item.postMedia[0]}"></figure>`;
     }
 
-    el.innerHTML = `<article class="card ${item.truth.class}" data-index="${item.index}" id="card_${item.index}">
+    el.innerHTML = `<article class="card ${item.truth.class}" data-item="${item.index}" id="card_${item.index}" tabindex="-1">
     <div class="tweet">
         <header>
             <div class="author"><b class="username"><span class="striked-text"><span>${randBlankString(20, 40)}</span></span></b><span class="tag"><span class="striked-text"><span>${randBlankString(12, 24)}</span></span></span></div>
-            <p class="message">${tweetLinks(item.postText[0])}</p>
+            <p class="message">${tweetLinks(item.postText[0], true)}</p>
         </header>
         <div class="target" data-item="${item.index}" tabindex="0">
             ${mediaTag}

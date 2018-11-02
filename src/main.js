@@ -12,9 +12,13 @@ var data = {
     lines: [],
     truth: { filename: "truth.jsonl", text: "", lines: [], items: [] },
     lookup: {},
-    count: 0,
+    count: 0
+};
+
+var view = {
     currentPage: -1,
-    itemsPerPage: 50
+    itemsPerPage: 50,
+    lastFocusedItem: null
 };
 
 var settings = JSON.parse(localStorage.getItem('settings')) || {
@@ -48,7 +52,10 @@ function init() {
 
         loadPage(settings.currentPage);
 
-        document.documentElement.scrollTop = settings.scrollTop || 0;
+        setTimeout(function() {
+            document.documentElement.scrollTop = settings.scrollTop || 0;
+            document.body.classList.remove("cards-not-loaded");
+        }, 50);
 
         window.addEventListener("scroll", function() {
             clearTimeout(scrollTimer);
@@ -58,48 +65,35 @@ function init() {
         });
 
         q("#prevPageBtn").addEventListener("click", function() {
-            loadPage(data.currentPage - 1);
+            loadPage(view.currentPage - 1);
         });
         q("#nextPageBtn").addEventListener("click", function() {
-            loadPage(data.currentPage + 1);
+            loadPage(view.currentPage + 1);
         });
         q("#currentPage").addEventListener("change", function() {
-            loadPage(this.value);
+            loadPage(parseInt(this.value));
         });
         q("#currentPage").addEventListener("focus", function() {
             this.select();
         });
 
-        document.body.addEventListener("mousedown", function() {
-            var el = q(".card.active");
-            if (el) el.classList.remove("active");
-        });
         document.body.addEventListener("keydown", function(event) {
+            // Ctrl+G - Go to post
             if (event.ctrlKey && event.key === "g") {
-                var index = prompt('Go to:');
-
-                if (!isNaN(index)) {
-                    var page = Math.ceil(index/data.itemsPerPage);
-                    if (data.currentPage !== page) loadPage(page);
-
-                    setTimeout(function() {
-                        var el = q(".card#card_" + (index-1));
-
-                        if (el) {
-                            document.documentElement.scrollTop = el.offsetTop - 20;
-                            el.classList.add("active");
-                        }
-                    }, 100);
-                }
-
+                goToPrompt();
                 event.preventDefault();
             }
-            else if (event.keyCode === 27) { // ESC
+            // Ctrl+P - Go to page
+            else if (event.ctrlKey && event.key === "p") {
+                q("#currentPage").focus();
+                event.preventDefault();
+            }
+            // ESC
+            else if (event.keyCode === 27) {
                 var el = q(".card.active");
-                if (el) el.classList.remove("active");
                 if (document.body.classList.contains("overlay-visible")) {
                     document.body.classList.remove("overlay-visible");
-                    if (data.lastFocusedItem) data.lastFocusedItem.focus();
+                    if (view.lastFocusedItem) view.lastFocusedItem.focus();
                 }
                 else {
                     document.activeElement.blur();
@@ -110,27 +104,42 @@ function init() {
 }
 
 function loadPage(page) {
-    var page_count = Math.ceil(data.count/data.itemsPerPage);
+    var page_count = Math.ceil(data.count/view.itemsPerPage);
     if (page > page_count) page = page_count;
     if (page < 1) page = 1;
 
     document.body.classList.remove("overlay-visible");
 
-    if (data.currentPage === page) return;
+    if (view.currentPage === page) return;
 
-    data.currentPage = page;
+    view.currentPage = page;
     saveSetting("currentPage", page);
 
     q("#currentPage").value = page;
     q("#currentPage").setAttribute("max", page_count);
     q("#totalPagesCount").textContent = page_count;
 
+    if (page === page_count) {
+        q("#nextPageBtn").disabled = true;
+    }
+    else {
+        q("#nextPageBtn").disabled = false;
+        if (page === 1) {
+            q("#prevPageBtn").disabled = true;
+        }
+        else {
+            q("#prevPageBtn").disabled = false;
+        }
+    }
+
     var listContent = q("#listContent");
     listContent.textContent = "";
 
-    var startFrom = (page - 1) * data.itemsPerPage;
+    document.body.classList.add("cards-not-loaded");
 
-    for (var i = 0; i < data.itemsPerPage; i++) {
+    var startFrom = (page - 1) * view.itemsPerPage;
+
+    for (var i = 0; i < view.itemsPerPage; i++) {
         var index = startFrom + i;
         if (index >= data.count) break;
 
@@ -138,20 +147,57 @@ function loadPage(page) {
 
         listContent.appendChild(el);
 
-        el.querySelector(".target").addEventListener("click", function(event) {
+        var card = el.querySelector(".card"), target = el.querySelector(".target");
+
+        card.addEventListener("focus", function() {
+            document.body.classList.add("has-card-focused");
+        });
+        card.addEventListener("blur", function() {
+            document.body.classList.remove("has-card-focused");
+        });
+
+        target.addEventListener("keydown", cardKeyHandler);
+        target.addEventListener("click", function(event) {
+            view.lastFocusedItem = this;
             viewArticle(getItemData(this.getAttribute("data-item")));
             event.preventDefault();
         });
-        el.querySelector(".target").addEventListener("keydown", function(event) {
-            if (event.keyCode === 13) {
-                data.lastFocusedItem = this;
-                viewArticle(getItemData(this.getAttribute("data-item")));
-                event.preventDefault();
-            }
-        });
     }
 
-    document.documentElement.scrollTop = 0;
+    setTimeout(function() {
+        document.documentElement.scrollTop = 0;
+        document.body.classList.remove("cards-not-loaded");
+    }, 50);
+}
+
+function cardKeyHandler(event) {
+    if (event.keyCode === 13) {
+        var index = this.getAttribute("data-item");        
+        view.lastFocusedItem = this;
+
+        viewArticle(getItemData(index));
+        
+        event.stopPropagation();
+        event.preventDefault();
+    }
+}
+
+function goToPrompt() {
+    var index = prompt('Go to:');
+
+    if (!isNaN(index)) {
+        var page = Math.ceil(index/view.itemsPerPage);
+        if (view.currentPage !== page) loadPage(page);
+
+        setTimeout(function() {
+            var el = q(".card#card_" + (index-1));
+
+            if (el) {
+                document.documentElement.scrollTop = el.offsetTop - 20;
+                el.focus();
+            }
+        }, 100);
+    }
 }
 
 function parseLines(lines) {

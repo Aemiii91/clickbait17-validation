@@ -4539,9 +4539,9 @@
 	  });
 	}
 
-	function tweetLinks(text) {
+	function tweetLinks(text, noLink) {
 	  return text.replace(/(^|\s)(@|#)(.*?)(?=$|\W)/g, function (result, m1, m2, m3) {
-	    return "".concat(m1, "<a href=\"https://twitter.com/").concat((m2 == "#" ? "hashtag/" : "") + m3, "\" target=\"_blank\">").concat(m2 + m3, "</a>");
+	    return "".concat(m1, "<a").concat(!noLink ? " href=\"https://twitter.com/".concat((m2 == "#" ? "hashtag/" : "") + m3, "\" target=\"_blank\"") : "", ">").concat(m2 + m3, "</a>");
 	  });
 	}
 
@@ -4553,7 +4553,7 @@
 	    mediaTag = "<figure class=\"media\"><img src=\"".concat(item.postMedia[0], "\"></figure>");
 	  }
 
-	  el.innerHTML = "<article class=\"card ".concat(item.truth.class, "\" data-index=\"").concat(item.index, "\" id=\"card_").concat(item.index, "\">\n    <div class=\"tweet\">\n        <header>\n            <div class=\"author\"><b class=\"username\"><span class=\"striked-text\"><span>").concat(randBlankString(20, 40), "</span></span></b><span class=\"tag\"><span class=\"striked-text\"><span>").concat(randBlankString(12, 24), "</span></span></span></div>\n            <p class=\"message\">").concat(tweetLinks(item.postText[0]), "</p>\n        </header>\n        <div class=\"target\" data-item=\"").concat(item.index, "\" tabindex=\"0\">\n            ").concat(mediaTag, "\n            <div class=\"summary\">\n                <h2 class=\"title\" title=\"").concat(item.targetTitle, "\">").concat(item.targetTitle, "</h2>\n                <p class=\"description\">").concat(item.targetDescription, "</p>\n                <a class=\"sharedlink\"><span class=\"striked-text\">").concat(randBlankString(24, 36), "</span></a>\n            </div>\n        </div>\n        <time class=\"timestamp\" datetime=\"").concat(item.timestamp.format(), "\">").concat(item.timestamp.format("h:mm A - MMM Do YYYY"), "</time>\n    </div>\n    <footer>\n        <div class=\"left\">#").concat(item.index + 1, "</div>\n        <div class=\"center\" data-title=\"").concat(item.truth.text, "\"><progress class=\"truth\" max=1 value=").concat(item.truth.mean, "></progress></div>\n        <div class=\"right\"><code class=\"entry-id\">").concat(item.id, "</code></div>\n    </footer>\n</article>");
+	  el.innerHTML = "<article class=\"card ".concat(item.truth.class, "\" data-item=\"").concat(item.index, "\" id=\"card_").concat(item.index, "\" tabindex=\"-1\">\n    <div class=\"tweet\">\n        <header>\n            <div class=\"author\"><b class=\"username\"><span class=\"striked-text\"><span>").concat(randBlankString(20, 40), "</span></span></b><span class=\"tag\"><span class=\"striked-text\"><span>").concat(randBlankString(12, 24), "</span></span></span></div>\n            <p class=\"message\">").concat(tweetLinks(item.postText[0], true), "</p>\n        </header>\n        <div class=\"target\" data-item=\"").concat(item.index, "\" tabindex=\"0\">\n            ").concat(mediaTag, "\n            <div class=\"summary\">\n                <h2 class=\"title\" title=\"").concat(item.targetTitle, "\">").concat(item.targetTitle, "</h2>\n                <p class=\"description\">").concat(item.targetDescription, "</p>\n                <a class=\"sharedlink\"><span class=\"striked-text\">").concat(randBlankString(24, 36), "</span></a>\n            </div>\n        </div>\n        <time class=\"timestamp\" datetime=\"").concat(item.timestamp.format(), "\">").concat(item.timestamp.format("h:mm A - MMM Do YYYY"), "</time>\n    </div>\n    <footer>\n        <div class=\"left\">#").concat(item.index + 1, "</div>\n        <div class=\"center\" data-title=\"").concat(item.truth.text, "\"><progress class=\"truth\" max=1 value=").concat(item.truth.mean, "></progress></div>\n        <div class=\"right\"><code class=\"entry-id\">").concat(item.id, "</code></div>\n    </footer>\n</article>");
 	  return el;
 	}
 
@@ -4587,7 +4587,7 @@
 	        wordCountClass = "";
 	    if (text.replace(/\s+/g, '') === "") wordCount = 0;
 	    if (wordCount > 100) wordCountClass = "long";else if (wordCount > 50) wordCountClass = "normal";else if (wordCount > 10) wordCountClass = "short";else if (wordCount > 1) wordCountClass = "snippet";else if (wordCount > 0) wordCountClass = "single-word";else wordCountClass = "empty";
-	    paragraph.innerHTML = tweetLinks(text);
+	    paragraph.innerHTML = tweetLinks(text, true);
 	    paragraph.setAttribute("data-word-count", wordCount);
 	    paragraph.classList.add("paragraph-" + wordCountClass);
 	    articleBody.appendChild(paragraph);
@@ -4620,9 +4620,12 @@
 	    items: []
 	  },
 	  lookup: {},
-	  count: 0,
+	  count: 0
+	};
+	var view = {
 	  currentPage: -1,
-	  itemsPerPage: 50
+	  itemsPerPage: 50,
+	  lastFocusedItem: null
 	};
 	var settings = JSON.parse(localStorage.getItem('settings')) || {
 	  currentPage: 1,
@@ -4646,7 +4649,10 @@
 	    listContent.classList.add("list-content");
 	    container.appendChild(listContent);
 	    loadPage(settings.currentPage);
-	    document.documentElement.scrollTop = settings.scrollTop || 0;
+	    setTimeout(function () {
+	      document.documentElement.scrollTop = settings.scrollTop || 0;
+	      document.body.classList.remove("cards-not-loaded");
+	    }, 50);
 	    window.addEventListener("scroll", function () {
 	      clearTimeout(scrollTimer);
 	      scrollTimer = setTimeout(function () {
@@ -4654,89 +4660,122 @@
 	      }, 500);
 	    });
 	    q("#prevPageBtn").addEventListener("click", function () {
-	      loadPage(data.currentPage - 1);
+	      loadPage(view.currentPage - 1);
 	    });
 	    q("#nextPageBtn").addEventListener("click", function () {
-	      loadPage(data.currentPage + 1);
+	      loadPage(view.currentPage + 1);
 	    });
 	    q("#currentPage").addEventListener("change", function () {
-	      loadPage(this.value);
+	      loadPage(parseInt(this.value));
 	    });
 	    q("#currentPage").addEventListener("focus", function () {
 	      this.select();
 	    });
-	    document.body.addEventListener("mousedown", function () {
-	      var el = q(".card.active");
-	      if (el) el.classList.remove("active");
-	    });
 	    document.body.addEventListener("keydown", function (event) {
+	      // Ctrl+G - Go to post
 	      if (event.ctrlKey && event.key === "g") {
-	        var index = prompt('Go to:');
-
-	        if (!isNaN(index)) {
-	          var page = Math.ceil(index / data.itemsPerPage);
-	          if (data.currentPage !== page) loadPage(page);
-	          setTimeout(function () {
-	            var el = q(".card#card_" + (index - 1));
-
-	            if (el) {
-	              document.documentElement.scrollTop = el.offsetTop - 20;
-	              el.classList.add("active");
-	            }
-	          }, 100);
-	        }
-
+	        goToPrompt();
 	        event.preventDefault();
-	      } else if (event.keyCode === 27) {
-	        // ESC
-	        var el = q(".card.active");
-	        if (el) el.classList.remove("active");
+	      } // Ctrl+P - Go to page
+	      else if (event.ctrlKey && event.key === "p") {
+	          q("#currentPage").focus();
+	          event.preventDefault();
+	        } // ESC
+	        else if (event.keyCode === 27) {
+	            var el = q(".card.active");
 
-	        if (document.body.classList.contains("overlay-visible")) {
-	          document.body.classList.remove("overlay-visible");
-	          if (data.lastFocusedItem) data.lastFocusedItem.focus();
-	        } else {
-	          document.activeElement.blur();
-	        }
-	      }
+	            if (document.body.classList.contains("overlay-visible")) {
+	              document.body.classList.remove("overlay-visible");
+	              if (view.lastFocusedItem) view.lastFocusedItem.focus();
+	            } else {
+	              document.activeElement.blur();
+	            }
+	          }
 	    });
 	  });
 	}
 
 	function loadPage(page) {
-	  var page_count = Math.ceil(data.count / data.itemsPerPage);
+	  var page_count = Math.ceil(data.count / view.itemsPerPage);
 	  if (page > page_count) page = page_count;
 	  if (page < 1) page = 1;
 	  document.body.classList.remove("overlay-visible");
-	  if (data.currentPage === page) return;
-	  data.currentPage = page;
+	  if (view.currentPage === page) return;
+	  view.currentPage = page;
 	  saveSetting("currentPage", page);
 	  q("#currentPage").value = page;
 	  q("#currentPage").setAttribute("max", page_count);
 	  q("#totalPagesCount").textContent = page_count;
+
+	  if (page === page_count) {
+	    q("#nextPageBtn").disabled = true;
+	  } else {
+	    q("#nextPageBtn").disabled = false;
+
+	    if (page === 1) {
+	      q("#prevPageBtn").disabled = true;
+	    } else {
+	      q("#prevPageBtn").disabled = false;
+	    }
+	  }
+
 	  var listContent = q("#listContent");
 	  listContent.textContent = "";
-	  var startFrom = (page - 1) * data.itemsPerPage;
+	  document.body.classList.add("cards-not-loaded");
+	  var startFrom = (page - 1) * view.itemsPerPage;
 
-	  for (var i = 0; i < data.itemsPerPage; i++) {
+	  for (var i = 0; i < view.itemsPerPage; i++) {
 	    var index = startFrom + i;
 	    if (index >= data.count) break;
 	    var el = renderItem(getItemData(index));
 	    listContent.appendChild(el);
-	    el.querySelector(".target").addEventListener("click", function (event) {
+	    var card = el.querySelector(".card"),
+	        target = el.querySelector(".target");
+	    card.addEventListener("focus", function () {
+	      document.body.classList.add("has-card-focused");
+	    });
+	    card.addEventListener("blur", function () {
+	      document.body.classList.remove("has-card-focused");
+	    });
+	    target.addEventListener("keydown", cardKeyHandler);
+	    target.addEventListener("click", function (event) {
+	      view.lastFocusedItem = this;
 	      viewArticle(getItemData(this.getAttribute("data-item")));
 	      event.preventDefault();
 	    });
-	    el.querySelector(".target").addEventListener("keydown", function (event) {
-	      if (event.keyCode === 13) {
-	        data.lastFocusedItem = this;
-	        viewArticle(getItemData(this.getAttribute("data-item")));
-	        event.preventDefault();
-	      }
-	    });
 	  }
 
-	  document.documentElement.scrollTop = 0;
+	  setTimeout(function () {
+	    document.documentElement.scrollTop = 0;
+	    document.body.classList.remove("cards-not-loaded");
+	  }, 50);
+	}
+
+	function cardKeyHandler(event) {
+	  if (event.keyCode === 13) {
+	    var index = this.getAttribute("data-item");
+	    view.lastFocusedItem = this;
+	    viewArticle(getItemData(index));
+	    event.stopPropagation();
+	    event.preventDefault();
+	  }
+	}
+
+	function goToPrompt() {
+	  var index = prompt('Go to:');
+
+	  if (!isNaN(index)) {
+	    var page = Math.ceil(index / view.itemsPerPage);
+	    if (view.currentPage !== page) loadPage(page);
+	    setTimeout(function () {
+	      var el = q(".card#card_" + (index - 1));
+
+	      if (el) {
+	        document.documentElement.scrollTop = el.offsetTop - 20;
+	        el.focus();
+	      }
+	    }, 100);
+	  }
 	}
 
 	function parseLines(lines) {

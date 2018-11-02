@@ -47,7 +47,7 @@ export default function viewArticle(item) {
         else if (wordCount > 0) wordCountClass = "single-word";
         else wordCountClass = "empty";
 
-        paragraph.innerHTML = tweetLinks(text);
+        paragraph.innerHTML = tweetLinks(text, true);
         paragraph.setAttribute("data-word-count", wordCount);
         paragraph.classList.add("paragraph-" + wordCountClass);
 
